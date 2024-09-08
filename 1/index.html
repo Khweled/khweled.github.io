@@ -11,6 +11,23 @@
         p {
             margin: 0 1em 0.5em 1em;
         }
+
+        .gridcont {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1px;
+            justify-content: center;
+        }
+
+        .griditem {
+            text-align: center;
+        }
+
+        .caption {
+            margin-top: 3px;
+            font-size: 1rem;
+            margin-bottom: 30px;
+        }
     </style>
 
     <title>Project 1</title>
@@ -85,21 +102,71 @@
     </p>
 
     <h1 align="center"> Gallery </h1>
-    <div style="text-align: center;">
-        <img src="media/gallery/aligned_emir.jpg" alt="Emir in his full unthrottled glory" height="550">
-        <img src="media/gallery/aligned_icon.jpg" alt="icon" height="550">
-        <img src="media/gallery/aligned_lady.jpg" alt="lady" height="550">
-        <img src="media/gallery/aligned_train.jpg" alt="train" height="550">
-        <img src="media/gallery/aligned_church.jpg" alt="church" height="550">
-        <img src="media/gallery/aligned_melons.jpg" alt="melons" height="550">
-        <img src="media/gallery/aligned_tobolsk.jpg" alt="tobolsk" height="550">
-        <img src="media/gallery/aligned_cathedral.jpg" alt="cathedral" height="550">
-        <img src="media/gallery/aligned_monastery.jpg" alt="monastery" height="550">
-        <img src="media/gallery/aligned_sculpture.jpg" alt="sculputre" height="550">
-        <img src="media/gallery/aligned_harvesters.jpg" alt="harvesters" height="550">
-        <img src="media/gallery/aligned_onion_church.jpg" alt="onion church" height="550">
-        <img src="media/gallery/aligned_three_generations.jpg" alt="three generations" height="550">
-        <img src="media/gallery/aligned_self_portrait.jpg" alt="self portrait" height="550">
+
+    <div class="gridcont" align="center">
+
+        <div class="griditem">
+            <img src="media/gallery/aligned_emir.jpg" alt="Emir in his full unthrottled glory" height="550">
+            <div class="caption">Runtime: 02:34.3 <br> Displacement: G(23, 49) R(40, 107)</div>
+        </div>
+
+        <div class="griditem">
+            <img src="media/gallery/aligned_icon.jpg" alt="icon" height="550">
+            <div class="caption">Runtime: 03:04.1 <br> Displacement: G(16, 38) R(22, 88)</div>
+        </div>
+
+        <div class="griditem">
+            <img src="media/gallery/aligned_lady.jpg" alt="lady" height="550">
+            <div class="caption">Runtime: 02:42.2 <br> Displacement: G(10, 56) R(13, 120)</div>
+        </div>
+
+        <div class="griditem">
+            <img src="media/gallery/aligned_train.jpg" alt="train" height="550">
+            <div class="caption">Runtime: 02:39.8 <br> Displacement: G(2, 48) R(28, 84)</div>
+        </div>
+
+        <div class="griditem">
+            <img src="media/gallery/aligned_church.jpg" alt="church" height="550">
+            <div class="caption">Runtime: 02:28.3 <br> Displacement: G(4, 25) R(-4, 58)</div>
+        </div>
+
+        <div class="griditem">
+            <img src="media/gallery/aligned_melons.jpg" alt="melons" height="550">
+            <div class="caption">Runtime: 02:43.9 <br> Displacement: G(9, 79) R(11, 182)</div>
+        </div>
+        <div class="griditem">
+            <img src="media/gallery/aligned_tobolsk.jpg" alt="tobolsk" height="550">
+            <div class="caption">Runtime: 00:01.3 <br> Displacement: G(2, 3) R(3 6)</div>
+        </div>
+        <div class="griditem">
+            <img src="media/gallery/aligned_cathedral.jpg" alt="cathedral" height="550">
+            <div class="caption">Runtime: 00:01.3 <br> Displacement: G(2, 5) R(3, 12)</div>
+        </div>
+        <div class="griditem">
+            <img src="media/gallery/aligned_monastery.jpg" alt="monastery" height="550">
+            <div class="caption">Runtime: 00:01.8 <br> Displacement: G(2, -3) R(2, 3)</div>
+        </div>
+        <div class="griditem">
+            <img src="media/gallery/aligned_sculpture.jpg" alt="sculputre" height="550">
+            <div class="caption">Runtime: 02:39.4 <br> Displacement: G(-11, 33) R(-27, 140)</div>
+        </div>
+        <div class="griditem">
+            <img src="media/gallery/aligned_harvesters.jpg" alt="harvesters" height="550">
+            <div class="caption">Runtime: 02:54.1 <br> Displacement: G(18, 60) R(9, 123)</div>
+        </div>
+        <div class="griditem">
+            <img src="media/gallery/aligned_onion_church.jpg" alt="onion church" height="550">
+            <div class="caption">Runtime: 04:40.8 <br> Displacement: G(24, 52) R(34, 107)</div>
+        </div>
+        <div class="griditem">
+            <img src="media/gallery/aligned_three_generations.jpg" alt="three generations" height="550">
+            <div class="caption">Runtime: 02:46.3 <br> Displacement: G(11, 56) R(7, 111)</div>
+        </div>
+        <div class="griditem">
+            <img src="media/gallery/aligned_self_portrait.jpg" alt="self portrait" height="550">
+            <div class="caption">Runtime: 03:00.9 <br> Displacement: G(29, 77) R(37, 175)</div>
+        </div>
+
     </div>
 </body>
 
