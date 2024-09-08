@@ -7,6 +7,10 @@
             font-family: Arial, sans-serif;
             margin: 20px;
         }
+
+        p {
+            margin: 0 1em 0.5em 1em;
+        }
     </style>
 
     <title>Project 1</title>
@@ -15,13 +19,88 @@
 <body>
 
     <h1 align="center">Images of the Russian Empire: Colorizing the Prokudin-Gorskii photo collection</h1>
-    <p>This projects goal is to align the red, green, and blue color channels of images. The images that I have used
-        were taken in early 1900s Russia. These photos were taken on black and white film but with a red, green and blue
-        filter over the camera in order to only capture the light of that color. This was achived by taking three
-        exposures, one ontop of another, to later be laid one ontop of another for true color images. Due to this
-        procedure the photos are not always 100% aligned. Here I will describe my procedure for automatically aligning
-        these images.</p>
+    <div style="text-align: center;">
+        <img src="media/gallery/aligned_emir.jpg" alt="Emir, in all his glory" height="400">
+    </div>
 
+    <h3> Overview </h3>
+    <p> Early in 1900's a Russian photographer, Sergei Mikhailovich Prokudin-Gorskii, attempted to make color photos by
+        taking three exposures through red, green and blue filters stacked one ontop of another. The goal of this
+        project is to create a procedure to automatically align each of these images to create a single color image with
+        as little errors in alignment as possible.
+    </p>
+
+    <h3> Basic Alignment </h3>
+
+    <p> The most straightforward way to align these images is to have some heuristic, and take the best score from all
+        possible ways to overlay the channels. This is very slow, we can do better. Since the images are already mostly
+        aligned we can search through a smaller displacement window and use the best score in that window. For the
+        heuristic we can take the summed squared errors of every pixel value and the lower the score the better the
+        displacement. Below are the results from this method.
+    </p>
+    <div style="text-align: center;">
+        <img src="media/basic_cathedral.jpg" alt="A Cathedral" height="300">
+        <img src="media/basic_emir.jpg" alt="Emir, only a fraction of his glory" height="300">
+    </div>
+
+    <h3> Image Pyramid </h3>
+
+    <p> For larger images the basic method is too slow, since the window we would need to search over can be hundreds of
+        pixels. A better way would be to rescale the images and do the basic alignment on the downscaled image. This
+        means if I rescaled an image down to 1/8th its original size, every pixel I cover will be 8 pixels in the
+        original image. With this knowledge we can find the best displacement for each rescaled image, and propagate
+        this displacment up our image pyramid to start the search from a more informed position. Not only does this
+        greatly increase performance but it also greatly increases the quality of the image as shown below.
+    </p>
+    <div style="text-align: center;">
+        <img src="media/pyramid_cathedral.jpg" alt="A Cathedral" height="300">
+        <img src="media/pyramid_emir.jpg" alt="Emir, at some of his glory" height="300">
+    </div>
+
+    <h1 align="center">Bells and Whistles </h1>
+
+    <h3> A Better Heuristic </h3>
+
+    <p> Using the raw pixel values has a major downfall, what if a large portion of the image is either red,
+        green, or blue? In the case of our friend Emir here, his clothes are mostly blue which means that we
+        might have some problems attempting to align his picture. One solution is to do edge dectection on the
+        image. Edge dectection finds the edges of objects in an image and outlines them. Using the edges of our
+        subject we can much better align his body and the background to their true displacement. I used canny
+        edge dectction, found in the skimage library, for simple and quick edge detection. While this did hurt
+        performance, in the end it led to greatly increased picture quality.
+    </p>
+    <div style="text-align: center;">
+        <img src="media/green_edge_cathedral.jpg" alt="A Cathedrals green channel edge detected" height="300">
+        <img src="media/green_edge_emir.jpg" alt="Emirs green channel edge detected" height="300">
+    </div>
+
+
+    <h3> Automatic Cropping </h3>
+
+    <p> From all the examples from above the borders of our image dont particularly look very nice, in order to fix this
+        I implemented automatic cropping. The basic idea is to use edge detection on the borders of an image (about the
+        outer 10% of the image) and find straight lines along the edge and crop the image there. In order to find the
+        best cropping I use several values to tweak the edge detection to be smoother or more granular, and I take the
+        maximum ammount of cropping and use that in the final result.
+    </p>
+
+    <h1 align="center"> Gallery </h1>
+    <div style="text-align: center;">
+        <img src="media/gallery/aligned_emir.jpg" alt="Emir in his full unthrottled glory" height="550">
+        <img src="media/gallery/aligned_icon.jpg" alt="icon" height="550">
+        <img src="media/gallery/aligned_lady.jpg" alt="lady" height="550">
+        <img src="media/gallery/aligned_train.jpg" alt="train" height="550">
+        <img src="media/gallery/aligned_church.jpg" alt="church" height="550">
+        <img src="media/gallery/aligned_melons.jpg" alt="melons" height="550">
+        <img src="media/gallery/aligned_tobolsk.jpg" alt="tobolsk" height="550">
+        <img src="media/gallery/aligned_cathedral.jpg" alt="cathedral" height="550">
+        <img src="media/gallery/aligned_monastery.jpg" alt="monastery" height="550">
+        <img src="media/gallery/aligned_sculpture.jpg" alt="sculputre" height="550">
+        <img src="media/gallery/aligned_harvesters.jpg" alt="harvesters" height="550">
+        <img src="media/gallery/aligned_onion_church.jpg" alt="onion church" height="550">
+        <img src="media/gallery/aligned_three_generations.jpg" alt="three generations" height="550">
+        <img src="media/gallery/aligned_self_portrait.jpg" alt="self portrait" height="550">
+    </div>
 </body>
 
 </html>
