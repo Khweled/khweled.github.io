@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    p {
+      margin: 0 1em 0.5em 1em;
+    }
+
+    .gridcont {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      justify-content: center;
+    }
+
+    .griditem {
+      text-align: center;
+    }
+
+    .caption {
+      margin-top: 3px;
+      font-size: 1rem;
+      margin-bottom: 30px;
+    }
+  </style>
+  <link rel="icon" type="image/png" sizes="32x32" href="../media/bourdian.png">
+
+
+  <title>Project 2</title>
+</head>
+
+<body>
+
+  <h1 align="center">Fun with Filters and Frequencies</h1>
+  <div style="text-align: center;">
+    <img src="media/2.4/handeye.jpg" alt="Hand with an eye in the palm" height="400">
+  </div>
+
+  <h3> Overview </h3>
+  <p> In this project we will explore the land of image filters! We can create derivative, gradient, low pass, and high
+    pass filters to augment images in interesting ways. Using these filters we can take bands of frequencies to create
+    hybrid images and blended images, showing off some really cool effects.
+  </p>
+
+  <h3> Finite Difference Operator </h3>
+
+  <p> If we want to take derivatives of images the biggest challenge is how do we deal with discrete values? The answer
+    is to use a finite derivative! we take the pixel value we are on and compute the difference of the pixel in front of
+    it. In vector form we get that d/dx = [-1, 1], we can then use convolutions to take the derivative of a whole image.
+    The same goes for the y-axis but instead of being a row we get a colum vector d/dy = [-1, 1]^T. Using these two
+    partial derivatives we can then compute the full gradient of an image, sqrt((d/dx)^2 +(d/dy)^2).
+  </p>
+
+  <div style="text-align: center;">
+    <img src="media/1/cameraman.png" alt="Original" height="400">
+    <div class="caption">Original Image</div>
+  </div>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/camera_dx.jpg" alt="camera d/dx" height="400">
+      <div class="caption">Partal derivative in x</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/camera_dy.jpg" alt="camera d/dy" height="400">
+      <div class="caption">Partal derivative in y</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/camera_grad.jpg" alt="camera d/dx" height="400">
+      <div class="caption">Gradient</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/camera_bin_grad.jpg" alt="camera d/dy" height="400">
+      <div class="caption">Binarized gradient</div>
+    </div>
+  </div>
+
+  <h3> Derivative of Gaussian Filter </h3>
+
+  <p> The binarized gradient has a lot of noise, so to get rid of this we can use a low pass filter to get rid of this
+    noise. Using a 2d gaussian kernel as our low pass filter we can see the effect it has on our derivatives.
+  </p>
+  <div style="text-align: center;">
+    <img src="media/1/camera_blur.jpg" alt="Blurred" height="400">
+    <div class="caption">Blurred Image Image</div>
+  </div>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/camera_blur_dx.jpg" alt="camera d/dx" height="400">
+      <div class="caption">Partal derivative in x</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/camera_blur_dy.jpg" alt="camera d/dy" height="400">
+      <div class="caption">Partal derivative in y</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/camera_blur_grad.jpg" alt="camera d/dx" height="400">
+      <div class="caption">Gradient</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/camera_blur_bin_grad.jpg" alt="camera d/dy" height="400">
+      <div class="caption">Binarized gradient</div>
+    </div>
+  </div>
+
+  <p> Comparing this with the original gradient, we can see our lines become thicker and more pronounced with less
+    noise, particularly around his legs. This filter create a very nice edge detector which will be usefull in the
+    following parts.
+  </p>
+
+
+  <h3> Image Sharpening</h3>
+
+  <p> Now with our low pass filter we can sharpen images! We achieve this by using a low pass filter on an image,
+    subtracting the low passed image from the original to just get the higher frequencies of an image. With these
+    details we can add it back onto the original image with a scaling factor (alpha) to highlight the details of our
+    image, making it sharper. Below are two examples, the Taj Mahal and my friends 15 year old cat reiny.
+  </p>
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/2.1/taj.jpg" alt="taj" height="400">
+      <div class="caption">Original</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.1/taj_sharp.jpg" alt="sharpend taj" height="400">
+      <div class="caption">Sharpened (alpha = 0.7)</div>
+    </div>
+  </div>
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/2.1/reiny.jpg" alt="reiny" height="400">
+      <div class="caption">Original</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.1/reiny_sharp.jpg" alt="sharpend reiny" height="400">
+      <div class="caption">Sharpened (alpha = 1)</div>
+    </div>
+  </div>
+
+
+  <p> We can also try to unblur a blurry image. To do this I will take a clear image, blur it, then sharpen the blurred
+    image. Below is a picture of me and my friends at the studio ghibli museum which will demonstrate this procedure.
+  </p>
+  <div style="text-align: center;">
+    <img src="media/2.1/ghibli.jpg" alt="Blurred" height="500">
+    <div class="caption">Me and friends infront of a Castle in the Sky statue</div>
+  </div>
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/2.1/ghibli_blur.jpg" alt="taj" height="500">
+      <div class="caption">Blurred</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.1/ghibli_sharp.jpg" alt="sharpend taj" height="500">
+      <div class="caption">Sharpened (alpha = 1)</div>
+    </div>
+  </div>
+
+  <p> While the sharpening does help some of the less detailed areas of the statue, things like faces are left mangled
+    and strange.
+  </p>
+
+
+  <h3> Hybrid Images </h3>
+
+  <p> To create hybrid images, we can take the low frequencies of one image and average them together with the high
+    frequencies of another image. To see both images, look up close to see the high passed image and from afar (or just
+    squint) to see the low passed image. We create the high and low passed images using the technique from our image
+    sharpening section. To have the best effect we first align two parts of the image then make a hybrid image.
+  </p>
+
+  <h4> Derek and Nutmeg </h4>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/2.2/DerekPicture.jpg" alt="taj" height="500">
+      <div class="caption">Low pass image</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.2/nutmeg.jpg" alt="sharpend taj" height="500">
+      <div class="caption">High Passed Image</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.2/derek_cathybrid_grey.jpg" alt="sharpend taj" height="500">
+      <div class="caption">Derek and nutmeg fused (B&W)</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.2/derek_cat_hybrid.jpg" alt="Blurred" height="500">
+      <div class="caption">Derek and nutmeg fused</div>
+    </div>
+  </div>
+
+
+  <h4> Ollie and Quantum Mechanics (Fail)</h4>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/2.2/ollie.jpg" alt="taj" height="500">
+      <div class="caption">Low pass image (Ollie)</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.2/book.jpg" alt="sharpend taj" height="500">
+      <div class="caption">High Passed Image (QM Book)</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.2/hybrid_olliehybrid_grey.jpg" alt="sharpend taj" height="500">
+      <div class="caption">Ollie on the cover of Griffiths QM(B&W)</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.2/hybrid_ollie_hybrid.jpg" alt="Blurred" height="500">
+      <div class="caption">Ollie on the cover of Griffiths QM</div>
+    </div>
+  </div>
+  <p> This didnt acheive the effect that I wanted since you can see ollie too clearly, I will revisit them later
+    however.
+  </p>
+
+  <h4> Kaden and Colleen </h4>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/2.2/Kaden.jpg" alt="taj" height="500">
+      <div class="caption">Low pass image (Me/Kaden)</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.2/Colleen.jpg" alt="sharpend taj" height="500">
+      <div class="caption">High Passed Image (Colleen my lovely girlfriend)</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.2/kaden_colleen_hybrid.jpg" alt="sharpend taj" height="500">
+      <div class="caption">Kaden and Collen Fused (B&W)</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.2/kaden_colleenhybrid_grey.jpg" alt="Blurred" height="500">
+      <div class="caption">Kaden and Collen Fused</div>
+    </div>
+  </div>
+  <p> I want to take a second to look at the fourier transforms of each step made along the way for this hybrid image.
+  </p>
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/2.2/image1_ft.jpg" alt="sharpend taj" height="500">
+      <div class="caption">FFT of Me</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.2/lows_ft.jpg" alt="taj" height="500">
+      <div class="caption">Low pass FFT of Me</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.2/image2_ft.jpg" alt="sharpend taj" height="500">
+      <div class="caption">FFT of Colleen</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.2/highs_ft.jpg" alt="sharpend taj" height="500">
+      <div class="caption">High Pass FFT of Colleen</div>
+    </div>
+  </div>
+  <div style="text-align: center;">
+    <img src="media/2.2/hybrid_ft.jpg" alt="Blurred" height="500">
+    <div class="caption">FFT of final hybrid image</div>
+  </div>
+
+  <h3> Gaussian and Laplacian Stacks</h3>
+
+  <p> Gaussian stacks take an image and for every level use a gaussian filter on the image in the previous layer.
+    Importantly the sizes of the images stays the same for all layers of the stack. For a Laplacian pyramid you take the
+    gaussian stack and at layer i of the stack do gaussian[i] - gaussian[i+1], at the final layer just use the final
+    layer of the gaussian stack. An important property of the laplacian stack is when you add up all the layers you get
+    the original image back. Below are the 4 layers of a laplacian stack which has been normalized to be easier to see.
+  </p>
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/2.3/apple.jpeg" alt="sharpend taj" height="500">
+      <div class="caption">Original</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.3/apple_ls_0.jpg" alt="sharpend taj" height="500">
+      <div class="caption">Layer 0</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.3/apple_ls_1.jpg" alt="sharpend taj" height="500">
+      <div class="caption">Layer 1</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.3/apple_ls_2.jpg" alt="sharpend taj" height="500">
+      <div class="caption">Layer 2</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.3/apple_ls_3.jpg" alt="sharpend taj" height="500">
+      <div class="caption">Layer 3</div>
+    </div>
+  </div>
+
+
+  <h3> Multiresolution Blending </h3>
+
+
+  <p> In order to create a smooth blend of two images we need to split each image up into certain frequencies. We use an
+    Laplacian stack to acheive this. Take 2 images, im1 and im2, we create a laplacian stack lap_im1 and lap_im2. We
+    also take some mask of the reigon we want to blend and create a gaussian stack gaus_mask. We can then make a blended
+    image by using the following equation, (1-gaus_mask) * lap_im1 + gaus_mask * lap_im2. This smoothly blends our two
+    images at each frequency we have in our laplacian stacks.
+  </p>
+
+  <h4> Oraple </h4>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/2.3/apple.jpeg" alt="sharpend taj" height="500">
+      <div class="caption">Image of apple</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.3/orange.jpeg" alt="sharpend taj" height="500">
+      <div class="caption">Image of orange</div>A
+    </div>
+    <div class="griditem">
+      <img src="media/2.4/oraple.jpg" alt="Blurred" height="500">
+      <div class="caption">The glorious Oraple</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.4/oraple_mask.jpg" alt="sharpend taj" height="500">
+      <div class="caption">Mask Used</div>A
+    </div>
+  </div>
+
+
+  <h4> Eyehand </h4>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/2.4/hand.jpg" alt="sharpend taj" height="500">
+      <div class="caption">Image of my hand</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.4/eye.jpg" alt="sharpend taj" height="500">
+      <div class="caption">Image of my eye</div>A
+    </div>
+    <div class="griditem">
+      <img src="media/2.4/handeye.jpg" alt="Blurred" height="500">
+      <div class="caption">Eyehand</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.4/eye_hand_mask.jpg" alt="sharpend taj" height="500">
+      <div class="caption">Mask Used</div>
+    </div>
+  </div>
+
+  <h4> Ollie on the Cover </h4>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/2.2/ollie.jpg" alt="sharpend taj" height="500">
+      <div class="caption">Image of Ollie</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.2/book.jpg" alt="sharpend taj" height="500">
+      <div class="caption">Image of QM Textbook</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.4/qm_ollie.jpg" alt="Blurred" height="500">
+      <div class="caption">Ollie on the Cover of my Textbook</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.4/cat_mask.jpg" alt="sharpend taj" height="500">
+      <div class="caption">Mask Used</div>
+    </div>
+  </div>
+
+</body>
+
+</html>
