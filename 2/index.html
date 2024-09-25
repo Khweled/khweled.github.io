@@ -111,10 +111,46 @@
   </div>
 
   <p> Comparing this with the original gradient, we can see our lines become thicker and more pronounced with less
-    noise, particularly around his legs. This filter create a very nice edge detector which will be usefull in the
-    following parts.
+    noise, particularly around his legs. To be slighly more efficient you can convolve the derivative filers with the
+    gaussian filter to create a single filter that has the same effect.
+  </p>
+  <div style="text-align: center;">
+    <img src="media/1/cameraman.png" alt="Blurred" height="400">
+    <div class="caption">Original Image</div>
+  </div>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/camera_dogx.jpg" alt="camera d/dx" height="400">
+      <div class="caption">DoG in x</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/camera_dogy.jpg" alt="camera d/dx" height="400">
+      <div class="caption">DoG in y</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/camera_dog_grad.jpg" alt="camera d/dx" height="400">
+      <div class="caption">Gradient of DoG</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/camera_dog_bin_grad.jpg" alt="camera d/dy" height="400">
+      <div class="caption">Binarized gradient of DoG</div>
+    </div>
+  </div>
+
+  <p> Comparing the all in one DoG filter with the two step process, we can see they are exactly the same.
   </p>
 
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/camera_dog_bin_grad.jpg" alt="camera d/dx" height="400">
+      <div class="caption">Dog</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/camera_blur_bin_grad.jpg" alt="camera d/dx" height="400">
+      <div class="caption">Blur then Derivative</div>
+    </div>
+  </div>
 
   <h3> Image Sharpening</h3>
 
@@ -127,6 +163,14 @@
     <div class="griditem">
       <img src="media/2.1/taj.jpg" alt="taj" height="400">
       <div class="caption">Original</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.1/taj_blur.jpg" alt="sharpend taj" height="400">
+      <div class="caption">Blurred</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2.1/taj_details.jpg" alt="sharpend taj" height="400">
+      <div class="caption">Details</div>
     </div>
     <div class="griditem">
       <img src="media/2.1/taj_sharp.jpg" alt="sharpend taj" height="400">
@@ -275,27 +319,9 @@
     layer of the gaussian stack. An important property of the laplacian stack is when you add up all the layers you get
     the original image back. Below are the 4 layers of a laplacian stack which has been normalized to be easier to see.
   </p>
-  <div class="gridcont" align="center">
-    <div class="griditem">
-      <img src="media/2.3/apple.jpeg" alt="sharpend taj" height="500">
-      <div class="caption">Original</div>
-    </div>
-    <div class="griditem">
-      <img src="media/2.3/apple_ls_0.jpg" alt="sharpend taj" height="500">
-      <div class="caption">Layer 0</div>
-    </div>
-    <div class="griditem">
-      <img src="media/2.3/apple_ls_1.jpg" alt="sharpend taj" height="500">
-      <div class="caption">Layer 1</div>
-    </div>
-    <div class="griditem">
-      <img src="media/2.3/apple_ls_2.jpg" alt="sharpend taj" height="500">
-      <div class="caption">Layer 2</div>
-    </div>
-    <div class="griditem">
-      <img src="media/2.3/apple_ls_3.jpg" alt="sharpend taj" height="500">
-      <div class="caption">Layer 3</div>
-    </div>
+  <div style="text-align: center;">
+    <img src="media/2.3/output.png" alt="Blurred" height="500">
+    <div class="caption">Layers 0, 2, 4 of the laplacian stacks</div>
   </div>
 
 
