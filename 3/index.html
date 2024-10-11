@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    p {
+      margin: 0 1em 0.5em 1em;
+    }
+
+    .gridcont {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      justify-content: center;
+    }
+
+    .griditem {
+      text-align: center;
+    }
+
+    .caption {
+      margin-top: 3px;
+      font-size: 1rem;
+      margin-bottom: 30px;
+    }
+  </style>
+  <link rel="icon" type="image/png" sizes="32x32" href="../media/bourdian.png">
+
+
+  <title>Project 3</title>
+</head>
+
+<body>
+
+  <h1 align="center">Face Morphing</h1>
+  <div style="text-align: center;">
+    <img src="media/3/kaden_colleen.gif" alt="Hand with an eye in the palm" height="400">
+  </div>
+
+  <h3> Overview </h3>
+  <p> This project is all about faces, particularly morphing faces. To morph faces we need to have some points on our
+    images that correspond to one another, like eyes to eyes, eyebrows to eyebrows. With this stepping point we can
+    create animations that morph between two people, change gender, ethnicity, and other traits.
+  </p>
+
+  <h3> Defining Correspondences</h3>
+
+  <p> To make faces morph well, we need to make sure that one they are somewhat aligned, and two, that there are some
+    points that correspond to eachother. These points should be on key features, most notably the eyes, mouth, eyebrows,
+    and silloutte of the face. I used a previous students website to create correspondences between two pictures. Who
+    better to morph into one person than me and my girlfriend Colleen.
+  </p>
+
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/kaden.jpg" alt="camera d/dx" height="400">
+      <div class="caption">Me</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/colleen.jpg" alt="camera d/dy" height="400">
+      <div class="caption">My lovely girlfriend Colleen</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/kaden_pts.png" alt="camera d/dx" height="400">
+      <div class="caption">Points on my face</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/colleen_pts.png" alt="camera d/dy" height="400">
+      <div class="caption">Points on her face</div>
+    </div>
+  </div>
+
+  <p> With these points I created a triangulation using Delaunay triangulation. However we should only use a
+    single triangulation for the rest of the steps. So I computed the average of my points and Colleens points and used
+    that from this point onward, we can see this average triangulation below.
+  </p>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/kaden_tris.png" alt="camera d/dx" height="400">
+      <div class="caption">My triangulation</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/colleen_tris.png" alt="camera d/dy" height="400">
+      <div class="caption">Colleens triangulation</div>
+    </div>
+  </div>
+
+  <h3> Computing the "Mid-way Face" </h3>
+
+  <p> A midway face is both of our faces warped to the average shape of our points. The most important step is warping,
+    for each triangle we can calculate an matrix that corresponds to an affine transformation from our shape to the
+    average shape. Then we can compute the inverse of the matrix, to find a 1 to 1 correspondance between my pixels and
+    the output images pixels. I used skimage.draw.polygon, which takes 3 points of a triangle and creates a mask, this
+    allows me to transform one triangle at a time. Below are both images morphed to the average shape.
+  </p>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/2/Kaden_mid.jpg" alt="camera d/dx" height="400">
+      <div class="caption">Me warped to the average shape</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2/colleen_mid.jpg" alt="camera d/dy" height="400">
+      <div class="caption">Colleen warped to the average shape</div>
+    </div>
+  </div>
+
+
+  <p> Then we can cross disolve the images, giving the illusion of a single person.
+  </p>
+  <div style="text-align: center;">
+    <img src="media/2/combined_mid.jpg" alt="Blurred" height="400">
+    <div class="caption">Mid-way Face</div>
+  </div>
+
+  <h3> The Morph Sequence</h3>
+
+  <p> Now we can compute a morph sequence by warping each frame to a weighted average of the two points. At time 0 its
+    fully my face and my face shape, and at time 45 its fully Colleens face and her shape, and at the mid-way, its the
+    midway face.
+  </p>
+
+  <div style="text-align: center;">
+    <img src="media/3/kaden_colleen.gif" alt="morph gif" height="400">
+  </div>
+
+
+  <h3> The "Mean face" of a population </h3>
+
+  <p> Now we want to start leveraging the power of averaging to get some cool effects. I used the danes dataset which
+    has several images of Danish people which I will use in the following part. For each image they had some set of
+    corresponding points, which I averaged together to get the "average shape of a Dane". Below I have warped a couple
+    of danes to the average shape.
+  </p>
+
+  <h4> Derek and Nutmeg </h4>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/4/dane1.jpg" alt="taj" height="300">
+      <div class="caption">Example 1</div>
+    </div>
+    <div class="griditem">
+      <img src="media/4/dane2.jpg" alt="sharpend taj" height="300">
+      <div class="caption">Example 2</div>
+    </div>
+    <div class="griditem">
+      <img src="media/4/dane1_avg.jpg" alt="taj" height="300">
+      <div class="caption">Example 1 warped</div>
+    </div>
+    <div class="griditem">
+      <img src="media/4/dane2_avg.jpg" alt="sharpend taj" height="300">
+      <div class="caption">Example 2 warped</div>
+    </div>
+  </div>
+
+  <p> Now we can average together all the images to create, "the most average Dane".
+  </p>
+  <div style="text-align: center;">
+    <img src="media/4/avg_dane.jpg" alt="morph gif" height="300">
+    <div class="caption">Average Dane</div>
+  </div>
+
+
+
+  <p> We can then warp my own face into the average dane, and vice versa to create a very uncanny image.
+  </p>
+  <div style="text-align: center;">
+    <img src="media/4/me.jpg" alt="morph gif" height="300">
+    <div class="caption">Me (again)</div>
+  </div>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/4/me_to_dane.jpg" alt="taj" height="300">
+      <div class="caption">Me to average Dane</div>
+    </div>
+    <div class="griditem">
+      <img src="media/4/dane_to_me.jpg" alt="sharpend taj" height="300">
+      <div class="caption">Average Dane to me</div>
+    </div>
+  </div>
+
+
+  <h4>Caricatures: Extrapolating from the mean</h4>
+  <p> We can create Caricatures of myself by using an alpha value that is greater or less than one when averaging. Below
+    I've created a caricature of me as a Dane, and me as myself.
+  </p>
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/5/extra_me.jpg" alt="taj" height="300">
+      <div class="caption">Me with my own features exaggerated.</div>
+    </div>
+    <div class="griditem">
+      <img src="media/5/extra_dane.jpg" alt="sharpend taj" height="300">
+      <div class="caption">Me with exaggerated Danish feautres</div>
+    </div>
+  </div>
+
+
+  <h4> Bells and Whistles (Gender and Ethnicity) </h4>
+  <p> I found an image online of the average Filipino woman, considering Colleen is also Filipino I thought this would
+    be an interesting combo. I created a correspondance between me and the average, and morphed me to her shape, morphed
+    her to my shape and cross dissolved, and morphed me to her shape and cross dissolved.
+  </p>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/bw/me.jpg" alt="taj" height="500">
+      <div class="caption">Me (yet again)</div>
+    </div>
+    <div class="griditem">
+      <img src="media/bw/averagefilipino.jpg" alt="sharpend taj" height="500">
+      <div class="caption">Average Filipino woman</div>
+    </div>
+    <div class="griditem">
+      <img src="media/bw/shape.jpg" alt="sharpend taj" height="500">
+      <div class="caption">Me with just the shape of the average</div>
+    </div>
+    <div class="griditem">
+      <img src="media/bw/appearance.jpg" alt="blurred" height="500">
+      <div class="caption">me with appearance of average</div>
+    </div>
+    <div class="griditem">
+      <img src="media/bw/shape_appearance.jpg" alt="blurred" height="500">
+      <div class="caption">Me with the shape and appearance of the average</div>
+    </div>
+  </div>
+
+
+
+</body>
+
+</html>
