@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    p {
+      margin: 0 1em 0.5em 1em;
+    }
+
+    .gridcont {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      justify-content: center;
+    }
+
+    .griditem {
+      text-align: center;
+    }
+
+    .caption {
+      margin-top: 3px;
+      font-size: 1rem;
+      margin-bottom: 30px;
+    }
+  </style>
+  <link rel="icon" type="image/png" sizes="32x32" href="../media/bourdian.png">
+
+
+  <title>Project 3</title>
+</head>
+
+<body>
+
+  <h1 align="center">IMAGE WARPING and MOSAICING</h1>
+  <div style="text-align: center;">
+    <img src="media/3/kaden_colleen.gif" alt="Hand with an eye in the palm" height="400">
+  </div>
+
+  <h3> Overview </h3>
+  <p>
+  </p>
+
+  <h3> Shoot the Pictures</h3>
+
+  <p> I took 3 sets of pictures for mosaics and 2 pictures for image rectification. For the mosaic pictures it was VERY
+    important to rotate about the cameras lens and not my own head. If this was not done the homographies would have
+    been off.
+  </p>
+
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/book.jpg" alt="camera d/dx" height="400">
+      <div class="caption">A random book in Main Stacks</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/laptop.jpg" alt="camera d/dx" height="400">
+      <div class="caption">My Laptop</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/vlsb1.jpeg" alt="camera d/dy" height="400">
+      <div class="caption">Outside of VLSB</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/vlsb2.jpeg" alt="camera d/dy" height="400">
+      <div class="caption">Outside of VLSB</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/vlsb3.jpeg" alt="camera d/dy" height="400">
+      <div class="caption">Outside of VLSB</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/sky_l.jpeg" alt="camera d/dy" height="400">
+      <div class="caption">View of the sunset from the Campanile</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/sky_m.jpeg" alt="camera d/dy" height="400">
+      <div class="caption">View of the sunset from the Campanile</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/sky_r.jpeg" alt="camera d/dy" height="400">
+      <div class="caption">View of the sunset from the Campanile</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/camp_l.jpeg" alt="camera d/dy" height="400">
+      <div class="caption">The Campanile</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/camp_m.jpeg" alt="camera d/dy" height="400">
+      <div class="caption">The Campanile</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/camp_r.jpeg" alt="camera d/dy" height="400">
+      <div class="caption">The Campanile</div>
+    </div>
+  </div>
+
+  <h3> Recover Homographies </h3>
+
+  <p> In order to create the mosaic'd images, we need to compute a homography matrix, so we can perform the operation
+    below.
+  </p>
+
+  <div style="text-align: center;">
+    <img src="media/2/hom.png" alt="Blurred" height="100">
+    <div class="caption">Homography equation</div>
+  </div>
+
+
+  <p> On each image we will set 4 corresponding points, typically corners of windows, or buildings. This way we know
+    both coordinates of the corresponding image. If we rearrange our equation to the form Ax = b, where x is a vector of
+    all unknowns, we can use least squares to solve for all the values in the homography matrix.
+  </p>
+
+
+  <h3> Warp the Images</h3>
+
+  <p> So again if we define a set of four or more corresponding points between two images (or just one image and some
+    set of points), we can warp any which way we please. Once we have the homography matrix, you can matrix multiply
+    every index of an image, and take the pixel values from every corresponding point.
+  </p>
+
+
+  <h3>Image Rectification </h3>
+
+  <p> This step leverages the warping function to take some object and make it a rectangle. It can be really helpful if
+    you have an object that might already be a rectangle, but the angle of the image makes it seem almost like a
+    trapezoid. We can plot points on the corner of whatever rectangle we have and morph it to some linear combination of
+    the 2d cartesian basis vectors.
+  </p>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/3/book.jpg" alt="taj" height="300">
+      <div class="caption">Book.</div>
+    </div>
+    <div class="griditem">
+      <img src="media/3/book_r.jpg" alt="sharpend taj" height="300">
+      <div class="caption">Book rectified</div>
+    </div>
+    <div class="griditem">
+      <img src="media/3/book_crop.jpg" alt="sharpend taj" height="300">
+      <div class="caption">Cropped</div>
+    </div>
+    <div class="griditem">
+      <img src="media/3/laptop.jpg" alt="sharpend taj" height="300">
+      <div class="caption">Laptop</div>
+    </div>
+    <div class="griditem">
+      <img src="media/3/laptop_r.jpg" alt="sharpend taj" height="300">
+      <div class="caption">Laptop rectified</div>
+    </div>
+    <div class="griditem">
+      <img src="media/3/laptop_crop.jpg" alt="sharpend taj" height="300">
+      <div class="caption">Cropped</div>
+    </div>
+  </div>
+
+
+
+  <h4>Blend the images into a mosaic </h4>
+  <p> Finally now we have all the peices in place to create a mosaic. Firstly I had 3 images, a middle and left/right or
+    top/bottom. Then I found corresponding points from the side image to the middle image, computed a homography, then
+    warped each image to the middle. Finally I stiched it all together making sure to properly align the corresponding
+    points. I also computed a mask to help blend all the images together.
+  </p>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/4/mos_vlsb.jpg" alt="taj" height="500">
+      <div class="caption">The full view of VLSB</div>
+    </div>
+  </div>
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/4/mos_sky.jpg" alt="taj" height="500">
+      <div class="caption">The full view of the sunset</div>
+    </div>
+  </div>
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/4/mos_camp.jpg" alt="taj" height="500">
+      <div class="caption">The full view of the campanile</div>
+    </div>
+  </div>
+
+  <p> These turned out really well, particularly the blending was much smoother than I would have ever thought. In my
+    code I had some problem keeping the output images of a certain size so I over compensated a bit.
+  </p>
+
+</body>
+
+</html>
