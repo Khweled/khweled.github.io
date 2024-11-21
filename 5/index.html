@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    p {
+      margin: 0 1em 0.5em 1em;
+    }
+
+    .gridcont {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      justify-content: center;
+    }
+
+    .griditem {
+      text-align: center;
+    }
+
+    .caption {
+      margin-top: 3px;
+      font-size: 1rem;
+      margin-bottom: 30px;
+    }
+  </style>
+  <link rel="icon" type="image/png" sizes="32x32" href="../media/bourdian.png">
+
+
+  <title>Project 5</title>
+</head>
+
+<body>
+
+  <h1 align="center">Fun With Diffusion Models</h1>
+  <div style="text-align: center;">
+    <img src="media/3/book_r.jpg" alt="Hand with an eye in the palm" height="400">
+  </div>
+
+
+  <h2>Part A</h2>
+
+  <h3>Setup</h3>
+
+  <p> For this part I will be leveraging the power of big data, and use the pretrained model DeepFloyd IF. By providing
+    the model a prompt and how many steps we want it to take, (more is higher quality), we can get AI generated images.
+    Throughout this whole project the seed I use is 137. Here are a few pictures at difference inference steps.
+  </p>
+
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/book.jpg" alt="camera d/dx" height="400">
+      <div class="caption">A random book in Main Stacks</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/laptop.jpg" alt="camera d/dx" height="400">
+      <div class="caption">My Laptop</div>
+    </div>
+  </div>
+
+
+  <h3> 1.1 Implementing the Forward Process </h3>
+
+  <p> We want to take some clean image, and give it some noise so we can use the models denoise abilities to create a
+    new image. We can define a system of "time" where at t=0 the image is completely clean, and at t=T the image is pure
+    noise. The model works by denoising each timestep little by little rather than going from a completely noisy image
+    to a clean one.
+  </p>
+
+  <div style="text-align: center;">
+    <img src="media/1/1/fwd_eq.png" alt="Blurred" height="100">
+    <div class="caption">Forward equation</div>
+  </div>
+
+
+  <p> Here x_0 is a clean image and x_t is the image at noise level t, alpha is a coefficent that determines how noisy
+    we want our image and is already predetermined for us. I implemented this function to create noisy images from an
+    original image.
+  </p>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/1/test.png" alt="camera d/dx" height="100">
+      <div class="caption">Campanile</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/1/noise_1.png" alt="camera d/dx" height="100">
+      <div class="caption">Noisy Campanile at t=250</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/1/noise_2.png" alt="camera d/dx" height="100">
+      <div class="caption">Noisy Campanile at t=500</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/1/noise_3.png" alt="camera d/dx" height="100">
+      <div class="caption">Noisy Campanile at t=750</div>
+    </div>
+  </div>
+
+
+  <h3> 1.2 Classical Denoising </h3>
+
+  <p> To contrast the power of diffusion models, here below is classical denoising (just a gaussian blur filter)
+  </p>
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/1/gaus_1.png" alt="camera d/dx" height="100">
+      <div class="caption">Classical Denoising at t=250</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/1/noise_1.png" alt="camera d/dx" height="100">
+      <div class="caption">Noisy Campanile at t=250</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/1/gaus_2.png" alt="camera d/dx" height="100">
+      <div class="caption">Classical Denoising at t=500</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/1/noise_2.png" alt="camera d/dx" height="100">
+      <div class="caption">Noisy Campanile at t=500</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/1/gaus_3.png" alt="camera d/dx" height="100">
+      <div class="caption">Classical Denoising at t=750</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/noise_3.png" alt="camera d/dx" height="100">
+      <div class="caption">Noisy Campanile at t=750</div>
+    </div>
+
+  </div>
+
+  <h3> 1.3 One-Step Denoising </h3>
+
+  <p> Now we can use our model to denoise since it has been trainied on such a large data set this should be much better
+    than classical methods. For all the parts below I used the prompt "a high quality image" except when otherwise
+    specified.
+  </p>
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/step_1.png" alt="camera d/dx" height="100">
+      <div class="caption">One-step Denoising at t=250</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/1/noise_1.png" alt="camera d/dx" height="100">
+      <div class="caption">Noisy Campanile at t=250</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/1/step_2.png" alt="camera d/dx" height="100">
+      <div class="caption">One-step Denoising at t=500</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/1/noise_2.png" alt="camera d/dx" height="100">
+      <div class="caption">Noisy Campanile at t=500</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/1/step_3.png" alt="camera d/dx" height="100">
+      <div class="caption">One-step Denoising at t=750</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/1/noise_3.png" alt="camera d/dx" height="100">
+      <div class="caption">Noisy Campanile at t=750</div>
+    </div>
+  </div>
+
+  <h3>1.4 Iterative Denoising</h3>
+
+  <p> Instead of running the model 1000 times to denoise an image at noise level 1000, we can skip some steps by running
+    the formula below, where alpha is defined above but beta is just 1 - alpha. The prime notation indicated the time
+    step before the current one. We can stride our timesteps by taking steps of 30 instead of one, cutting down on a lot
+    of compute time.
+  </p>
+
+  <div style="text-align: center;">
+    <img src="media/1/4/equ.png" alt="Blurred" height="100">
+    <div class="caption">Denoise equation</div>
+  </div>
+
+  <p> Below is the results of iterative denoising, showing 5 different levels of noise and the final cleaned up image,
+    along side the guassian denoise, the original image and the one step denoised image.
+  </p>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/4/n1.png" alt="camera d/dx" height="100">
+      <div class="caption">t=90</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/4/n2.png" alt="camera d/dx" height="100">
+      <div class="caption">t=240</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/4/n3.png" alt="camera d/dx" height="100">
+      <div class="caption">t=390</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/4/n4.png" alt="camera d/dx" height="100">
+      <div class="caption">t=540</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/4/n5.png" alt="camera d/dx" height="100">
+      <div class="caption">t=690</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/1/test.png" alt="camera d/dx" height="100">
+      <div class="caption">Original</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/4/clean.png" alt="camera d/dx" height="100">
+      <div class="caption">Iteratively denoised</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/1/step_3.png" alt="camera d/dx" height="100">
+      <div class="caption">One-Step denoised</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/4/gaus.png" alt="camera d/dx" height="100">
+      <div class="caption">Classical denoised</div>
+    </div>
+
+  </div>
+
+
+
+  <h3>1.5 Diffusion Model Sampling </h3>
+  <p> Instead of denoising to an existing image, if we denoise from pure noise we can get a brand new image. Here I used
+    the prompt, a high quality image.
+  </p>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/5/im1.png" alt="camera d/dx" height="100">
+      <div class="caption">Sample 1</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/5/im2.png" alt="camera d/dx" height="100">
+      <div class="caption">Sample 2</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/5/im3.png" alt="camera d/dx" height="100">
+      <div class="caption">Sample 3</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/5/im4.png" alt="camera d/dx" height="100">
+      <div class="caption">Sample 4</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/5/im5.png" alt="camera d/dx" height="100">
+      <div class="caption">Sample 5</div>
+    </div>
+  </div>
+
+  <h3>1.6 Classifier-Free Guidance (CFG) </h3>
+  <p> Those images are somewhat in the uncanny valley, so to fix this we can also add some unconditional noise. This
+    will decrease image diversification but massively increase quality. By averaging the noise with the equation e = e_u
+    + g(e_c - e_u). Where e is the error, and g is gamma a factor we set.
+  </p>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/6/s1.png" alt="camera d/dx" height="100">
+      <div class="caption">Sample 1</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/6/s2.png" alt="camera d/dx" height="100">
+      <div class="caption">Sample 2</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/6/s3.png" alt="camera d/dx" height="100">
+      <div class="caption">Sample 3</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/6/s4.png" alt="camera d/dx" height="100">
+      <div class="caption">Sample 4</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/6/s5.png" alt="camera d/dx" height="100">
+      <div class="caption">Sample 5</div>
+    </div>
+  </div>
+
+
+  <h3> 1.7 Image-to-image Translation </h3>
+  <p> Here we are going to take some image, then noise it a little bit and run the denoising algorithm, this will
+    provide us with a series of images that will progessively look more like the original.
+  </p>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/7/camp/s1.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=1</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/camp/s2.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=3</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/camp/s3.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=5</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/camp/s4.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=7</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/camp/s5.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=10</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/camp/s6.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=20</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/1/test.png" alt="camera d/dx" height="100">
+      <div class="caption">Original</div>
+    </div>
+  </div>
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/7/chill_guy/s1.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=1</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/chill_guy/s2.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=3</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/chill_guy/s3.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=5</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/chill_guy/s4.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=7</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/chill_guy/s5.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=10</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/chill_guy/s6.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=20</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/chill_guy.png" alt="camera d/dx" height="100">
+      <div class="caption">Original</div>
+    </div>
+  </div>
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/7/ab/s1.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=1</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/ab/s2.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=3</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/ab/s3.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=5</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/ab/s4.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=7</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/ab/s5.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=10</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/ab/s6.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=20</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/ab.png" alt="camera d/dx" height="100">
+      <div class="caption">Original</div>
+    </div>
+  </div>
+
+  <h3>1.7.1 Editing Hand-Drawn and Web Images</h3>
+  <p> Lets do the same thing but with some hand drawn images as well as some other fun ones.
+  </p>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/7/1/frog/s1.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=1</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/1/frog/s2.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=3</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/1/frog/s3.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=5</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/1/frog/s4.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=7</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/1/frog/s5.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=10</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/1/frog/s6.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=20</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/1/frog/frog.png" alt="camera d/dx" height="100">
+      <div class="caption">Original</div>
+    </div>
+  </div>
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/7/1/im_house/s1.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=1</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/1/im_house/s2.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=3</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/1/im_house/s3.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=5</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/1/im_house/s4.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=7</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/1/im_house/s5.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=10</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/1/im_house/s6.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=20</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/1/im_house/house.png" alt="camera d/dx" height="100">
+      <div class="caption">Original</div>
+    </div>
+  </div>
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/7/1/im_cat/s1.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=1</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/1/im_cat/s2.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=3</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/1/im_cat/s3.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=5</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/1/im_cat/s4.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=7</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/1/im_cat/s5.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=10</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/1/im_cat/s6.png" alt="camera d/dx" height="100">
+      <div class="caption">Start=20</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/1/im_cat/cat.png" alt="camera d/dx" height="100">
+      <div class="caption">Original</div>
+    </div>
+  </div>
+
+  <h3>1.7.2 Inpainting</h3>
+
+  <p> We can also selectively replace parts of an image by creating a mask and only noising and denoising that part of
+    the image.
+  </p>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/7/2/camp/download.png" alt="camera d/dx" height="100">
+      <div class="caption">Original</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/2/camp/download-1.png" alt="camera d/dx" height="100">
+      <div class="caption">Mask</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/2/camp/download-2.png" alt="camera d/dx" height="100">
+      <div class="caption">To replace</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/2/camp/download-3.png" alt="camera d/dx" height="100">
+      <div class="caption">Final</div>
+    </div>
+  </div>
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/7/2/ab/download.png" alt="camera d/dx" height="100">
+      <div class="caption">Original</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/2/ab/download-1.png" alt="camera d/dx" height="100">
+      <div class="caption">Mask</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/2/ab/download-2.png" alt="camera d/dx" height="100">
+      <div class="caption">To replace</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/2/ab/download-3.png" alt="camera d/dx" height="100">
+      <div class="caption">Final</div>
+    </div>
+  </div>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/7/2/chill/download.png" alt="camera d/dx" height="100">
+      <div class="caption">Original</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/2/chill/download-1.png" alt="camera d/dx" height="100">
+      <div class="caption">Mask</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/2/chill/download-2.png" alt="camera d/dx" height="100">
+      <div class="caption">To replace</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/2/chill/download-3.png" alt="camera d/dx" height="100">
+      <div class="caption">Final</div>
+    </div>
+  </div>
+
+  <h3>1.7.3 Text-Conditional Image-to-image Translation</h3>
+
+  <p> Here I denoise on a particular prompt to make a kind of blend between the prompt and the original.
+  </p>
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/7/3/camp/download.png" alt="camera d/dx" height="100">
+      <div class="caption">Noise level 1</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/3/camp/download-1.png" alt="camera d/dx" height="100">
+      <div class="caption">Noise level 3</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/3/camp/download-2.png" alt="camera d/dx" height="100">
+      <div class="caption">Noise level 5</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/3/camp/download-3.png" alt="camera d/dx" height="100">
+      <div class="caption">Noise level 7</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/3/camp/download-4.png" alt="camera d/dx" height="100">
+      <div class="caption">Noise level 10</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/3/camp/download-5.png" alt="camera d/dx" height="100">
+      <div class="caption">Noise level 20</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/2/camp/download.png" alt="camera d/dx" height="100">
+      <div class="caption">Original</div>
+    </div>
+  </div>
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/7/3/ab/download.png" alt="camera d/dx" height="100">
+      <div class="caption">Noise level 1</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/3/ab/download-1.png" alt="camera d/dx" height="100">
+      <div class="caption">Noise level 3</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/3/ab/download-2.png" alt="camera d/dx" height="100">
+      <div class="caption">Noise level 5</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/3/ab/download-3.png" alt="camera d/dx" height="100">
+      <div class="caption">Noise level 7</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/3/ab/download-4.png" alt="camera d/dx" height="100">
+      <div class="caption">Noise level 10</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/3/ab/download-5.png" alt="camera d/dx" height="100">
+      <div class="caption">Noise level 20</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/2/ab/download.png" alt="camera d/dx" height="100">
+      <div class="caption">Original</div>
+    </div>
+  </div>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/7/3/chill_guy/download.png" alt="camera d/dx" height="100">
+      <div class="caption">Noise level 1</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/3/chill_guy/download-1.png" alt="camera d/dx" height="100">
+      <div class="caption">Noise level 3</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/3/chill_guy/download-2.png" alt="camera d/dx" height="100">
+      <div class="caption">Noise level 5</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/3/chill_guy/download-3.png" alt="camera d/dx" height="100">
+      <div class="caption">Noise level 7</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/3/chill_guy/download-4.png" alt="camera d/dx" height="100">
+      <div class="caption">Noise level 10</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/3/chill_guy/download-5.png" alt="camera d/dx" height="100">
+      <div class="caption">Noise level 20</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/7/2/chill/download.png" alt="camera d/dx" height="100">
+      <div class="caption">Original</div>
+    </div>
+  </div>
+
+  <h3>1.8 Visual Anagrams</h3>
+
+  <p> We can keep playing around with these ideas by using two prompts, with two noises, we can flip one image and its
+    noise, average them together and add it to our image. This will create a "visual anagram" where looking at the image
+    right side up or upside down will show different things.
+  </p>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/8/old.png" alt="camera d/dx" height="100">
+      <div class="caption">Old man</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/8/camp.png" alt="camera d/dx" height="100">
+      <div class="caption">Campfire</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/8/dog.png" alt="camera d/dx" height="100">
+      <div class="caption">Dog</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/8/snow.png" alt="camera d/dx" height="100">
+      <div class="caption">Snowy village</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/8/man.png" alt="camera d/dx" height="100">
+      <div class="caption">Barista</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/8/coast.png" alt="camera d/dx" height="100">
+      <div class="caption">Amalfi coast</div>
+    </div>
+  </div>
+
+  <h3>1.9 Hybrid Images</h3>
+
+  <p> Using the same idea as before but applying a low and highpass filter to each prompt and adding together the noise
+    will result in some hybrid images.
+  </p>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/1/9/man.png" alt="camera d/dx" height="100">
+      <div class="caption">Man and Coast</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/9/dog.png" alt="camera d/dx" height="100">
+      <div class="caption">Dog and snowy village</div>
+    </div>
+    <div class="griditem">
+      <img src="media/1/9/skull.png" alt="camera d/dx" height="100">
+      <div class="caption">Skull and waterfall</div>
+    </div>
+  </div>
+
+
+
+
+  <h2 align="center">Diffusion Models from Scratch</h2>
+
+  <p> Above is only possible due to the vast ammounts of data these models are trained on. Here we will build one of
+    these models from scratch and train it on the MNIST dataset.
+  </p>
+
+
+  <h3> B.1.1 Implementing the UNet </h3>
+
+  <p> Here I have implemented the blocks seen below, and with the help of pytorch put together a model to create digits.
+  </p>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/2/model.png" alt="taj" height="400">
+      <div class="caption">Model</div>
+    </div>
+  </div>
+
+  <h3>B.1.2 Using the UNet to Train a Denoiser</h3>
+
+  <p> Lets add some noise to our digits, below ive added normal noise to a digit at varing sigma levels
+  </p>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/2/sigma.png" alt="taj" height="200">
+      <div class="caption">Noise at various sigmas</div>
+    </div>
+  </div>
+
+  <p> Ive trained the model to deblur images at sigma level 0.5, below is the loss curve, Ive optimized over an L2 loss.
+  </p>
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/2/denoise_loss.png" alt="taj" height="400">
+      <div class="caption"></div>
+    </div>
+  </div>
+
+
+  <p> Here are some results denoising using this model at different epochs.
+  </p>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/2/denoise_2.png" alt="taj" height="400">
+      <div class="caption">Epoch 1</div>
+    </div>
+    <div class="griditem">
+      <img src="media/2/denoise_2.png" alt="taj" height="400">
+      <div class="caption">Epoch 5</div>
+    </div>
+  </div>
+
+
+  <p> Testing this on sigmas not trained on, it shows it lacks effectiveness for more noisy images.
+  </p>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/2/more_noise.png" alt="taj" height="300">
+      <div class="caption"></div>
+    </div>
+
+  </div>
+
+
+  <h3>B.2 Adding Time Conditioning to UNet</h3>
+  <p> In order to make this better with more noise, we can add a fully connected layer into our model, below I've shown
+    the training losses, as well as a sampling at epoch 5 and 20 </p>
+
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/2/2/time-1.png" alt="taj" height="400">
+      <div class="caption"></div>
+    </div>
+    <div class="griditem">
+      <img src="media/2/2/time-2.png" alt="taj" height="400">
+      <div class="caption"></div>
+    </div>
+    <div class="griditem">
+      <img src="media/2/2/time-loss.png" alt="taj" height="400">
+      <div class="caption"></div>
+    </div>
+  </div>
+
+  <h3>B.2 Adding Class-Conditioning to UNet</h3>
+  <p> Again to make this better we can tell the model what class the number is training on, this should lead to better
+    results. Below is the trainign losses as well as samples from epoch 5 and 20. </p>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/2/2/class-1.png" alt="taj" height="400">
+      <div class="caption"></div>
+    </div>
+    <div class="griditem">
+      <img src="media/2/2/class-2.png" alt="taj" height="400">
+      <div class="caption"></div>
+    </div>
+    <div class="griditem">
+      <img src="media/2/2/class-loss.png" alt="taj" height="400">
+      <div class="caption"></div>
+    </div>
+  </div>
+
+
+</body>
+
+</html>
