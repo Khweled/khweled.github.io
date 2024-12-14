@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    p {
+      margin: 0 1em 0.5em 1em;
+    }
+
+    .gridcont {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      justify-content: center;
+    }
+
+    .griditem {
+      text-align: center;
+    }
+
+    .caption {
+      margin-top: 3px;
+      font-size: 1rem;
+      margin-bottom: 30px;
+    }
+  </style>
+  <link rel="icon" type="image/png" sizes="32x32" href="../media/bourdian.png">
+
+
+  <title>Final Project</title>
+</head>
+
+<body>
+
+  <h1 align="center">Poor Man's Augmented Reality</h1>
+  <div style="text-align: center;">
+    <img src="media/AR/output.gif" alt="Hand with an eye in the palm" height="400">
+  </div>
+
+
+
+
+  <h3> Keypoints with Known 3D Coordinates</h3>
+
+  <p> I used the video created by a past student as the base of my AR. I set (0,0,0) of the world coordinates to the
+    corner of the box, and manually mapped each intersection of squares to the 2d pixel coordinates. For the 3d world
+    coordinates, I just treat each square as a unit square, thus the base of the world coordinates.
+  </p>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/AR/ar2.gif" alt="taj" height="200">
+      <div class="caption">Original Video</div>
+    </div>
+    <div class="griditem">
+      <img src="media/AR/marked.png" alt="taj" height="200">
+      <div class="caption">First frame with marked points</div>
+    </div>
+  </div>
+
+  <h3> Propogating Keypoints to other Images in the Video </h3>
+
+  <p> I used cv2's calcOpticalFlowPyrLK, since the suggested function was not avalible on my version of cv2. I used a
+    15x15 area to search for where the keypoint went, and for each new frame I use the previous frames tracked point
+    position to find the newest position in the image.
+
+    Below is a video of the tracked points on the box.
+  </p>
+
+  <div style="text-align: center;">
+    <img src="media/AR/tracking.gif" alt="Blurred" height="200">
+    <div class="caption">Keypoints tracked on moving target</div>
+  </div>
+
+  <h3> Projecting a cube in the Scene </h3>
+
+  <p> Now I define in the world coordinates where I want my cube to be, and at each frame compute the matrix with the
+    world coordinates and that frames tracked keypoint locations. Then I multiply these coordinates to get the 2d image
+    location of the cube to draw.
+  </p>
+
+  <div style="text-align: center;">
+    <img src="media/AR/output.gif" alt="Blurred" height="300">
+    <div class="caption">Drawn Cube</div>
+  </div>
+
+
+  <h1 align="center">High Dynamic Range Imaging</h1>
+  <div style="text-align: center;">
+    <img src="media/HDR/chapel/global_simple.png" alt="Hand with an eye in the palm" height="500">
+  </div>
+
+  <h3> Setup </h3>
+
+  <p> A big problem when someone takes a photo is lighting, if you dont have the correct lighting (its too much contrast
+    or dark or bright) it can make certain images look terrible. A fix for this is high dynamic range. In short this
+    will make us be able to see the darkest and lightest parts of our image easily.
+  </p>
+
+  <h3>Radiance map construction</h3>
+
+  <p> This involves calculating the response function g, and the log of each pixels irradiance. Since each image was
+    captured at several different exposures, we take the ith pixel from the jth image to estimate these two values using
+    least squares. Below is a selection of images at different shutter speeds.
+  </p>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/HDR/chapel/1_1024.png" alt="taj" height="300">
+      <div class="caption">Shutter speed 1/1024</div>
+    </div>
+    <div class="griditem">
+      <img src="media/HDR/chapel/1_16.png" alt="sharpend taj" height="300">
+      <div class="caption">Shutter speed 1/1024</div>
+    </div>
+    <div class="griditem">
+      <img src="media/HDR/chapel/1_1.png" alt="sharpend taj" height="300">
+      <div class="caption">Shutter speed 1</div>
+    </div>
+    <div class="griditem">
+      <img src="media/HDR/chapel/32_1.png" alt="sharpend taj" height="300">
+      <div class="caption">Shutter speed 32</div>
+    </div>
+  </div>
+
+
+  <p> Also graphed below is the log of exposure and the corresponding pixel values for each color channel. We see how as
+    exposure increases so does the pixel brightness, which makes sense.
+  </p>
+
+
+  <p> Next we need to construct the HDR image, and once we have g, it is simple. One note, in our calculation we use a
+    weighting function so we dont have pixels become near zero or near 255, we want everything to stay within a good
+    range. Below is an averaged HDR image as well as a per channel HDR image.
+  </p>
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/HDR/chapel/hdr_radiance_map.png" alt="taj" height="300">
+      <div class="caption">Per Channel radiance map</div>
+    </div>
+    <div class="griditem">
+      <img src="media/HDR/chapel/hdr_radiance_map_mean.png" alt="sharpend taj" height="300">
+      <div class="caption">Averaged radiance map</div>
+    </div>
+  </div>
+
+
+  <h3> Tone Mapping </h3>
+  <p> Now we can make our image look even better by squeezing the dyamic range of the image so we can see the brights
+    and the darks much better. The first attempt at this will be a global scaling which just scales the values to be
+    inbetween 0 and 1. Global simple which just applies a pixelwise transform first, then normalizes. And finally Durand
+    tone mapping, which uses a lot of steps found on the spec page to make our image look nicer.
+  </p>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/HDR/chapel/global_simple.png" alt="taj" height="500">
+      <div class="caption">Global Simple Tone Mapping</div>
+    </div>
+    <div class="griditem">
+      <img src="media/HDR/chapel/global_scale.png" alt="taj" height="500">
+      <div class="caption">Global Scale Tone Mapping</div>
+    </div>
+    <div class="griditem">
+      <img src="media/HDR/chapel/durand.png" alt="taj" height="500">
+      <div class="caption">Durand Tone Mapping</div>
+    </div>
+  </div>
+
+  <h2> GALLERY </h2>
+
+  <p> Below is the global scale and Durand tone mappings for each image. </p>
+
+  <div class="gridcont" align="center">
+    <div class="griditem">
+      <img src="media/HDR/chapel/global_simple.png" alt="taj" height="500">
+      <div class="caption">Global Simple Tone Mapping</div>
+    </div>
+    <div class="griditem">
+      <img src="media/HDR/chapel/durand.png" alt="taj" height="500">
+      <div class="caption">Durand Tone Mapping</div>
+    </div>
+    <div class="griditem">
+      <img src="media/HDR/arch/global_simple.png" alt="taj" height="500">
+      <div class="caption">Global Simple Tone Mapping</div>
+    </div>
+    <div class="griditem">
+      <img src="media/HDR/arch/durand.png" alt="taj" height="500">
+      <div class="caption">Durand Tone Mapping</div>
+    </div>
+    <div class="griditem">
+      <img src="media/HDR/bonsai/global_simple.png" alt="taj" height="400">
+      <div class="caption">Global Simple Tone Mapping</div>
+    </div>
+    <div class="griditem">
+      <img src="media/HDR/bonsai/durand.png" alt="taj" height="400">
+      <div class="caption">Durand Tone Mapping</div>
+    </div>
+    <div class="griditem">
+      <img src="media/HDR/garage/global_simple.png" alt="taj" height="400">
+      <div class="caption">Global Simple Tone Mapping</div>
+    </div>
+    <div class="griditem">
+      <img src="media/HDR/garage/durand.png" alt="taj" height="400">
+      <div class="caption">Durand Tone Mapping</div>
+    </div>
+    <div class="griditem">
+      <img src="media/HDR/garden/global_simple.png" alt="taj" height="400">
+      <div class="caption">Global Simple Tone Mapping</div>
+    </div>
+    <div class="griditem">
+      <img src="media/HDR/garden/durand.png" alt="taj" height="400">
+      <div class="caption">Durand Tone Mapping</div>
+    </div>
+    <div class="griditem">
+      <img src="media/HDR/house/global_simple.png" alt="taj" height="400">
+      <div class="caption">Global Simple Tone Mapping</div>
+    </div>
+    <div class="griditem">
+      <img src="media/HDR/house/durand.png" alt="taj" height="400">
+      <div class="caption">Durand Tone Mapping</div>
+    </div>
+    <div class="griditem">
+      <img src="media/HDR/mug/global_simple.png" alt="taj" height="400">
+      <div class="caption">Global Simple Tone Mapping</div>
+    </div>
+    <div class="griditem">
+      <img src="media/HDR/mug/durand.png" alt="taj" height="400">
+      <div class="caption">Durand Tone Mapping</div>
+    </div>
+    <div class="griditem">
+      <img src="media/HDR/window/global_simple.png" alt="taj" height="400">
+      <div class="caption">Global Simple Tone Mapping</div>
+    </div>
+    <div class="griditem">
+      <img src="media/HDR/window/durand.png" alt="taj" height="400">
+      <div class="caption">Durand Tone Mapping</div>
+    </div>
+  </div>
+
+
+</html>
